@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO Chat</title>
+    <style>
+      body {
+        background-color: #ff605c;
+        padding: 15px;
+      }
+      #messages {
+        width: 80%;
+        max-width: 1200px;
+      }
+      #messages div {
+        background-color: #e5e5e5;
+        margin: 5px;
+        padding: 7px;
+        border-radius: 5px;
+        border: black 1px solid;
+      }
+
+      #send-container {
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        background-color: #ffbd44;
+        border-radius: 5px;
+        width: 90vw;
+        height: 40px;
+        padding: 12px;
+      }
+      #send-container input,button{
+        
+        margin: 2px;
+      }
+      #container {
+        padding: 12px;
+        height: 100%;
+      }
+      .card {
+        width: 100%;
+        height: 90vh;
+        margin: 0 auto;
+        background-color: #f8fbfe;
+        border-radius: 8px;
+        z-index: 1;
+      }
+
+      .tools {
+        display: flex;
+        align-items: center;
+        padding: 9px;
+      }
+
+      .circle {
+        padding: 0 4px;
+      }
+
+      .box {
+        display: inline-block;
+        align-items: center;
+        width: 10px;
+        height: 10px;
+        padding: 1px;
+        border-radius: 50%;
+      }
+
+      .red {
+        background-color: #ff605c;
+      }
+
+      .yellow {
+        background-color: #ffbd44;
+      }
+
+      .green {
+        background-color: #00ca4e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="tools">
+        <div class="circle">
+          <span class="red box"></span>
+        </div>
+        <div class="circle">
+          <span class="yellow box"></span>
+        </div>
+        <div class="circle">
+          <span class="green box"></span>
+        </div>
+      </div>
+      <div id="container">
+        <div id="messages"></div>
+
+        <div id="send-container">
+          <input
+            id="usernameInput"
+            autocomplete="off"
+            placeholder="Enter your username"
+          /><br />
+          <input
+            id="roomInput"
+            autocomplete="off"
+            placeholder="Enter room name"
+          /><br />
+          <button id="joinRoom">Join Room</button><br />
+          <input
+            id="messageInput"
+            autocomplete="off"
+            placeholder="Type your message"
+          />
+
+          <button id="send">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(function () {
+        const socket = io();
+
+        $("#joinRoom").click(() => {
+          const username = $("#usernameInput").val();
+          const room = $("#roomInput").val();
+
+          if (username && room) {
+            socket.emit("join", { username, room });
+            $("#usernameInput").prop("disabled", true);
+            $("#roomInput").prop("disabled", true);
+          }
+        });
+
+        $("#send").click(() => {
+          const message = $("#messageInput").val();
+          socket.emit("chat message", message);
+          $("#messageInput").val("");
+        });
+
+        socket.on("chat message", (message) => {
+          $("#messages").append($("<div>").text(message));
+        });
+      });
+    </script>
+  </body>
+</html>
